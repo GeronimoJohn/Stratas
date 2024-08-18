@@ -3,16 +3,18 @@
 import React from 'react'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
-import Toolbar from '@mui/material/Drawer'
 import { ThemeProvider } from '@/libs/ThemeProvider'
+import { useTheme } from '@mui/material/styles'
+import { Coffee } from '../Coffee'
 
-const drawerWidth = 240
+const drawerWidth = 280
 
 interface PageWrapperProps {
   children: React.ReactNode
 }
 
 export function PageWrapper({ children }: PageWrapperProps) {
+  const theme = useTheme()
   return (
     <ThemeProvider>
       <Box sx={{ display: 'flex' }}>
@@ -21,13 +23,19 @@ export function PageWrapper({ children }: PageWrapperProps) {
           sx={{
             width: drawerWidth,
             flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
             '& .MuiDrawer-paper': {
+              display: 'flex',
               width: drawerWidth,
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              flexDirection: 'column',
+              borderRight: `2px solid ${theme.palette.background.paper}`
             }
           }}
         >
-          <Toolbar />
+          <Box sx={{ flexGrow: 1 }} />
+          <Coffee />
         </Drawer>
         <Box
           component="main"
@@ -37,7 +45,6 @@ export function PageWrapper({ children }: PageWrapperProps) {
             width: { sm: `calc(100% - ${drawerWidth}px)` }
           }}
         >
-          <Toolbar />
           {children}
         </Box>
       </Box>

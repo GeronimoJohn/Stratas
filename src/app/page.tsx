@@ -3,10 +3,18 @@ import Typography from '@mui/material/Typography'
 
 export default function Page() {
   return (
-    <Box sx={{ backgroundColor: 'primary.main', height: '100%', padding: 2 }}>
-      <Typography variant="h4">Welcome to My App</Typography>
-      <Typography>
-        This content will appear in the main area next to the sidebar.
+    <Box
+      sx={{
+        mt: '100px',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'column'
+      }}
+    >
+      <Typography variant="h1">Stratas</Typography>
+      <Typography variant="h4">
+        Inspired by strata, representing different levels or layers
       </Typography>
     </Box>
   )

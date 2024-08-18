@@ -5,26 +5,40 @@ export const stratasComponents: Required<Pick<ThemeOptions, 'components'>> = {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '20px'
+          textTransform: 'none',
+          boxShadow: 'none'
         }
-      }
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.05)',
-          borderRadius: '12px'
-        }
-      }
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
+      },
+      defaultProps: {
+        disableRipple: true
+      },
+      variants: [
+        {
+          props: {
+            size: 'large'
+          },
+          style: {
+            minHeight: '42px',
+            borderRadius: '16px',
+            fontWeight: 700
+          }
+        },
+        {
+          props: { size: 'medium' },
+          style: {
+            minHeight: '36.5px',
+            borderRadius: '12px',
+            fontWeight: 700
+          }
+        },
+        {
+          props: { size: 'small' },
+          style: {
+            minHeight: '30.75px',
             borderRadius: '8px'
           }
         }
-      }
+      ]
     }
   }
 }
