@@ -5,12 +5,13 @@ import { stratasComponents } from './tokens/components'
 
 export function getStratasTheme(): Pick<
   ThemeOptions,
-  'components' | 'palette' | 'typography'
+  'components' | 'palette' | 'typography' | 'spacing'
 > {
   const theme = {
     ...stratasColors,
     ...stratasTypography,
-    ...stratasComponents
+    ...stratasComponents,
+    spacing: 4
   }
 
   return createTheme(theme)
