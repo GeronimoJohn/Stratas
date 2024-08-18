@@ -4,7 +4,6 @@ import React from 'react'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import Toolbar from '@mui/material/Drawer'
-import { useTheme } from '@mui/material/styles'
 import { ThemeProvider } from '@/libs/ThemeProvider'
 
 const drawerWidth = 240
@@ -14,8 +13,6 @@ interface PageWrapperProps {
 }
 
 export function PageWrapper({ children }: PageWrapperProps) {
-  const theme = useTheme()
-
   return (
     <ThemeProvider>
       <Box sx={{ display: 'flex' }}>

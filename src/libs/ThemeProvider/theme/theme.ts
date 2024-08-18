@@ -7,7 +7,6 @@ export function getStratasTheme(): Pick<
   ThemeOptions,
   'components' | 'palette' | 'typography'
 > {
-  // return the colors in object not as function
   const theme = {
     ...stratasColors,
     ...stratasTypography,
