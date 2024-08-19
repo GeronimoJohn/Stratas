@@ -1,21 +1,41 @@
 'use client'
 
-import { ReactElement } from 'react'
-import { useDropzone } from 'react-dropzone'
+import { ReactElement, useCallback, useState } from 'react'
+import { useDropzone, FileRejection } from 'react-dropzone'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Chip from '@mui/material/Chip'
+import Alert from '@mui/material/Alert'
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+const ACCEPTED_FILE_TYPES = ['.csv', '.xls', '.xlsx']
 
 export function FileDropzone(): ReactElement {
-  const { getRootProps, getInputProps } = useDropzone()
+  const [fileRejections, setFileRejections] = useState<FileRejection[]>([])
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      setFileRejections(fileRejections)
+      console.log('Accepted files:', acceptedFiles)
+    },
+    []
+  )
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: ACCEPTED_FILE_TYPES.reduce(
+      (acc, type) => ({ ...acc, [type]: [] }),
+      {}
+    ),
+    maxSize: MAX_FILE_SIZE
+  })
 
   return (
     <Stack
-      gap={5}
+      gap={2}
       sx={{
         p: 4,
-        height: 200,
         width: 600,
         borderRadius: 2,
         backgroundColor: 'background.default',
@@ -25,43 +45,45 @@ export function FileDropzone(): ReactElement {
       <Box
         sx={{
           p: 4,
-          pb: 2,
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 2,
-          border: '3px dashed #726f6f',
-          backgroundColor: 'background.paper'
+          border: '3px dashed',
+          borderColor: isDragActive ? 'primary.main' : 'text.secondary',
+          backgroundColor: 'background.paper',
+          transition: 'border-color 0.2s ease-in-out'
         }}
+        {...getRootProps()}
       >
-        <Box {...getRootProps({ className: 'dropzone' })}>
-          <input {...getInputProps()} />
-          <p>Drag 'n' drop some files here, or click to select files</p>
-        </Box>
+        <input {...getInputProps()} />
+        <Typography>
+          {isDragActive
+            ? 'Drop the files here...'
+            : "Drag 'n' drop some files here, or click to select files"}
+        </Typography>
       </Box>
+      {fileRejections.length > 0 && (
+        <Alert severity="error">
+          {fileRejections.map(({ file, errors }) => (
+            <Box key={file.name}>
+              {file.name} - {errors.map((e) => e.message).join(', ')}
+            </Box>
+          ))}
+        </Alert>
+      )}
       <Stack
-        gap={2}
         direction="row"
-        alignSelf="flex-end"
         alignItems="center"
-        justifyContent="center"
-        sx={{ mt: 'auto' }}
+        justifyContent="flex-end"
+        spacing={2}
       >
-        <Typography variant="h4">Accepted Files: </Typography>
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            '& .MuiChip-root': {
-              backgroundColor: 'warning.main',
-              color: 'text.primary'
-            }
-          }}
-        >
-          <Chip label=".csv" />
-          <Chip label=".xls" />
+        <Typography variant="body2">Accepted Files: </Typography>
+        <Stack direction="row" spacing={1}>
+          {ACCEPTED_FILE_TYPES.map((type) => (
+            <Chip key={type} label={type} color="warning" size="small" />
+          ))}
         </Stack>
       </Stack>
     </Stack>
