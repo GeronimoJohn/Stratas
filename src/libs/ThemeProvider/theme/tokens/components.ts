@@ -45,7 +45,8 @@ export const stratasComponents: Required<Pick<ThemeOptions, 'components'>> = {
         root: {
           borderRadius: 20,
           fontSize: '0.8rem',
-          fontWeight: 600
+          fontWeight: 600,
+          backgroundColor: 'warning'
         }
       }
     }
