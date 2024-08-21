@@ -1,8 +1,8 @@
 import Button from '@mui/material/Button'
 import CoffeeRoundedIcon from '@mui/icons-material/CoffeeRounded'
-import React from 'react'
+import { ReactElement } from 'react'
 
-export function Coffee() {
+export function Coffee(): ReactElement {
   function handleClick() {
     console.log('Implementing this feature soon!')
   }
