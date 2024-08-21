@@ -7,29 +7,48 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Chip from '@mui/material/Chip'
 import Alert from '@mui/material/Alert'
+import { parse, ParseResult } from 'papaparse'
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-const ACCEPTED_FILE_TYPES = {
-  'text/csv': ['.csv'],
-  'application/vnd.ms-excel': ['.xls'],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+interface StudentInformation {
+  id: string
+  name: string
+  reading: number
+  writing: number
+  math: number
+  specialNeeds: boolean
 }
 
-export function FileDropzone(): ReactElement {
+interface FileDropZoneProps {
+  handleParsedData: (parsedData: StudentInformation[]) => void
+}
+
+export function FileDropzone({
+  handleParsedData
+}: FileDropZoneProps): ReactElement {
   const [fileRejections, setFileRejections] = useState<FileRejection[]>([])
+
+  function processFileData(file: File) {
+    const reader = new FileReader()
+    reader.onabort = () => console.log('file reading was aborted')
+    reader.onerror = () => console.log('file reading has failed')
+    reader.onload = () => {
+      const result = reader.result as string
+      parse(result, {
+        header: true,
+        dynamicTyping: true,
+        complete: (results: ParseResult<StudentInformation>) => {
+          handleParsedData(results.data)
+        }
+      })
+    }
+    reader.readAsText(file)
+  }
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       setFileRejections(fileRejections)
       acceptedFiles.forEach((file) => {
-        const reader = new FileReader()
-        reader.onabort = () => console.log('file reading was aborted')
-        reader.onerror = () => console.log('file reading has failed')
-        reader.onload = () => {
-          const textStr = reader.result as string
-          console.log(textStr)
-        }
-        reader.readAsText(file)
+        processFileData(file)
       })
     },
     []
@@ -37,8 +56,10 @@ export function FileDropzone(): ReactElement {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: ACCEPTED_FILE_TYPES,
-    maxSize: MAX_FILE_SIZE
+    accept: {
+      'text/csv': ['.csv']
+    },
+    maxSize: 5 * 1024 * 1024
   })
 
   return (
@@ -92,8 +113,6 @@ export function FileDropzone(): ReactElement {
         <Typography variant="body2">Accepted Files: </Typography>
         <Stack direction="row" spacing={1}>
           <Chip label=".csv" color="warning" />
-          <Chip label=".xls" color="warning" />
-          <Chip label=".xlsx" color="warning" />
         </Stack>
       </Stack>
     </Stack>

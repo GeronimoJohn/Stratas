@@ -1,7 +1,7 @@
 import { PageWrapper } from '@/components/PageWrapper'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { ReactElement } from 'react'
+import { ReactElement, ReactNode } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children
 }: Readonly<{
-  children: React.ReactNode
+  children: ReactNode
 }>): ReactElement {
   return (
     <html lang="en">
