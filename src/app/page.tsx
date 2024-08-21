@@ -1,4 +1,5 @@
-import { FileDropzone } from '@/components/FileDropzone'
+import { ClassDashboard } from '@/components/ClassDashboard'
+import { FileDropzone } from '@/components/ClassDashboard/FileDropzone'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { ReactElement } from 'react'
@@ -7,9 +8,11 @@ export default function Page(): ReactElement {
   return (
     <Box
       sx={{
-        pt: 20,
+        p: 20,
         gap: 10,
-        height: '100vh',
+        minHeight: '100vh',
+        overflow: 'auto',
+        height: '100%',
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
@@ -28,7 +31,7 @@ export default function Page(): ReactElement {
           Inspired by strata, representing different levels or layers
         </Typography>
       </Box>
-      <FileDropzone />
+      <ClassDashboard />
     </Box>
   )
 }

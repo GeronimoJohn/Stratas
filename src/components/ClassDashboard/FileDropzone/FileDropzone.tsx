@@ -8,22 +8,14 @@ import Stack from '@mui/material/Stack'
 import Chip from '@mui/material/Chip'
 import Alert from '@mui/material/Alert'
 import { parse, ParseResult } from 'papaparse'
-
-interface StudentInformation {
-  id: string
-  name: string
-  reading: number
-  writing: number
-  math: number
-  specialNeeds: boolean
-}
+import { StudentInformation } from '@/libs/classSorter'
 
 interface FileDropZoneProps {
-  handleParsedData: (parsedData: StudentInformation[]) => void
+  handleStudentsInformation: (studentsInformation: StudentInformation[]) => void
 }
 
 export function FileDropzone({
-  handleParsedData
+  handleStudentsInformation
 }: FileDropZoneProps): ReactElement {
   const [fileRejections, setFileRejections] = useState<FileRejection[]>([])
 
@@ -37,7 +29,7 @@ export function FileDropzone({
         header: true,
         dynamicTyping: true,
         complete: (results: ParseResult<StudentInformation>) => {
-          handleParsedData(results.data)
+          handleStudentsInformation(results.data)
         }
       })
     }
