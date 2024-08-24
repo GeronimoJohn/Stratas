@@ -17,16 +17,11 @@ export function StudentConflicts({
   setStudentConflicts
 }: StudentConflictsProps): ReactElement {
   const handleAddConflict = (newConflict: StudentPair) => {
-    setStudentConflicts((prevConflicts) => [
-      ...(prevConflicts || []),
-      newConflict
-    ])
+    setStudentConflicts([...studentConflicts, newConflict])
   }
 
   const handleRemoveConflict = (index: number) => {
-    setStudentConflicts((prevConflicts) =>
-      (prevConflicts || []).filter((_, i) => i !== index)
-    )
+    setStudentConflicts(studentConflicts.filter((_, i) => i !== index))
   }
 
   return (
