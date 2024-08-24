@@ -13,18 +13,28 @@ import {
   StudentInformation
 } from '@/libs/classSorter'
 
+import type { StudentPair } from '../StudentConflicts/StudentConflicts'
+
 interface ClassGroupsProps {
   studentsInformation?: StudentInformation[]
+  studentConflicts?: StudentPair[]
 }
 
 export function ClassGroups({
-  studentsInformation = []
+  studentsInformation = [],
+  studentConflicts
 }: ClassGroupsProps): ReactElement {
   const numberOfGroups = 3
 
+  console.log(studentConflicts)
+
   const sortedStudents = sortByScore(studentsInformation)
   const { specialNeeds, regular } = splitBySpecialNeeds(sortedStudents)
-  const groups = classSorter([...specialNeeds, ...regular], numberOfGroups)
+  const groups = classSorter(
+    [...specialNeeds, ...regular],
+    numberOfGroups,
+    studentConflicts
+  )
 
   return (
     <Stack

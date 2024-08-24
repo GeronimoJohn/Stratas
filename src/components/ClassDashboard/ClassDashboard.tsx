@@ -30,7 +30,10 @@ export function ClassDashboard(): ReactElement {
         studentConflicts={studentConflicts}
         setStudentConflicts={setStudentConflicts}
       />
-      <ClassGroups studentsInformation={studentsInformation} />
+      <ClassGroups
+        studentsInformation={studentsInformation}
+        studentConflicts={studentConflicts}
+      />
     </Stack>
   )
 }
