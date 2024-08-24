@@ -73,6 +73,15 @@ export function ClassGroups({
 }
 
 function StudentCard({ student }: { student: GroupedStudent }): ReactElement {
+  const backgroundColor =
+    student.specialNeeds === true
+      ? 'secondary.main'
+      : student.totalScore > 7
+        ? 'success.main'
+        : student.totalScore > 4
+          ? 'warning.main'
+          : 'error.main'
+
   return (
     <>
       {student.name != null ? (
@@ -88,7 +97,7 @@ function StudentCard({ student }: { student: GroupedStudent }): ReactElement {
         >
           <Avatar
             alt={student.name}
-            sx={{ backgroundColor: 'warning.main', color: 'text.primary' }}
+            sx={{ backgroundColor, color: 'text.primary' }}
           >
             {student.name.charAt(0)}
           </Avatar>
