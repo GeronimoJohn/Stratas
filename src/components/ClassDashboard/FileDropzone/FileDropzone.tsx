@@ -55,16 +55,7 @@ export function FileDropzone({
   })
 
   return (
-    <Stack
-      gap={2}
-      sx={{
-        p: 4,
-        width: 600,
-        borderRadius: 2,
-        backgroundColor: 'background.default',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
-      }}
-    >
+    <Stack gap={2} sx={{ width: '100%' }}>
       <Box
         sx={{
           p: 4,

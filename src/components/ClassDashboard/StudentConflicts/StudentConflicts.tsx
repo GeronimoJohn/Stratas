@@ -1,5 +1,5 @@
 import { Dispatch, ReactElement, SetStateAction } from 'react'
-import Paper from '@mui/material/Paper'
+import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 import { ConflictPairInput } from './ConflictPairInput'
@@ -25,7 +25,7 @@ export function StudentConflicts({
   }
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
+    <Box>
       <Typography variant="h5" gutterBottom>
         Student Conflicts
       </Typography>
@@ -34,6 +34,6 @@ export function StudentConflicts({
         conflicts={studentConflicts}
         onRemoveConflict={handleRemoveConflict}
       />
-    </Paper>
+    </Box>
   )
 }

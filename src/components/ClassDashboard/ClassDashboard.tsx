@@ -16,7 +16,7 @@ export function ClassDashboard(): ReactElement {
   )
   const [numberOfGroups, setNumberOfGroups] = useState<number>(2)
 
-  const handleNumberOfGroupsChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleGroupsNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10)
     if (!isNaN(value) && value > 0) {
       setNumberOfGroups(value)
@@ -27,24 +27,30 @@ export function ClassDashboard(): ReactElement {
     <Stack
       gap={5}
       justifyItems="center"
-      alignItems="center"
+      alignItems="start"
       sx={{
-        width: '100%'
+        p: 4,
+        width: 600,
+        borderRadius: 2,
+        backgroundColor: 'background.default',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
       }}
     >
       <FileDropzone
         handleStudentsInformation={(data) => setStudentsInformation(data)}
       />
-      <StudentConflicts
-        studentConflicts={studentConflicts}
-        setStudentConflicts={setStudentConflicts}
-      />
       <TextField
         type="number"
         label="Number of Groups"
         value={numberOfGroups}
-        onChange={handleNumberOfGroupsChange}
+        onChange={handleGroupsNumberChange}
         inputProps={{ min: 1 }}
+        variant="outlined"
+        size="small"
+      />
+      <StudentConflicts
+        studentConflicts={studentConflicts}
+        setStudentConflicts={setStudentConflicts}
       />
       <ClassGroups
         studentsInformation={studentsInformation}
