@@ -47,9 +47,9 @@ export function ClassDashboard(): ReactElement {
           label="Number of Groups"
           value={numberOfGroups}
           onChange={handleGroupsNumberChange}
-          inputProps={{ min: 1 }}
           variant="outlined"
           size="small"
+          sx={{ width: '30%' }}
         />
         <StudentConflicts
           studentConflicts={studentConflicts}
