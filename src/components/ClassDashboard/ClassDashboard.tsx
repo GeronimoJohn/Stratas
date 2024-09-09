@@ -27,31 +27,35 @@ export function ClassDashboard(): ReactElement {
     <Stack
       gap={5}
       justifyItems="center"
-      alignItems="start"
-      sx={{
-        p: 4,
-        width: 600,
-        borderRadius: 2,
-        backgroundColor: 'background.default',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
-      }}
+      alignItems="center"
+      sx={{ width: '100%' }}
     >
-      <FileDropzone
-        handleStudentsInformation={(data) => setStudentsInformation(data)}
-      />
-      <TextField
-        type="number"
-        label="Number of Groups"
-        value={numberOfGroups}
-        onChange={handleGroupsNumberChange}
-        inputProps={{ min: 1 }}
-        variant="outlined"
-        size="small"
-      />
-      <StudentConflicts
-        studentConflicts={studentConflicts}
-        setStudentConflicts={setStudentConflicts}
-      />
+      <Stack
+        gap={5}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          backgroundColor: 'background.default',
+          boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        <FileDropzone
+          handleStudentsInformation={(data) => setStudentsInformation(data)}
+        />
+        <TextField
+          type="number"
+          label="Number of Groups"
+          value={numberOfGroups}
+          onChange={handleGroupsNumberChange}
+          inputProps={{ min: 1 }}
+          variant="outlined"
+          size="small"
+        />
+        <StudentConflicts
+          studentConflicts={studentConflicts}
+          setStudentConflicts={setStudentConflicts}
+        />
+      </Stack>
       <ClassGroups
         studentsInformation={studentsInformation}
         studentConflicts={studentConflicts}
