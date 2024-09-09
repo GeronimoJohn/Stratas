@@ -18,14 +18,14 @@ import type { StudentPair } from '../StudentConflicts/StudentConflicts'
 interface ClassGroupsProps {
   studentsInformation?: StudentInformation[]
   studentConflicts?: StudentPair[]
+  numberOfGroups: number
 }
 
 export function ClassGroups({
   studentsInformation = [],
-  studentConflicts
+  studentConflicts,
+  numberOfGroups
 }: ClassGroupsProps): ReactElement {
-  const numberOfGroups = 3
-
   console.log(studentConflicts)
 
   const sortedStudents = sortByScore(studentsInformation)

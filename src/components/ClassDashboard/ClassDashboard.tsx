@@ -1,8 +1,9 @@
 'use client'
 
-import { ReactElement, useState } from 'react'
+import { ChangeEvent, ReactElement, useState } from 'react'
 import { FileDropzone } from './FileDropzone'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import { ClassGroups } from './ClassGroups'
 import { StudentInformation } from '@/libs/classSorter'
 import { StudentConflicts } from './StudentConflicts'
@@ -13,18 +14,39 @@ export function ClassDashboard(): ReactElement {
   const [studentConflicts, setStudentConflicts] = useState<[string, string][]>(
     []
   )
+  const [numberOfGroups, setNumberOfGroups] = useState<number>(2)
+
+  const handleGroupsNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10)
+    if (!isNaN(value) && value > 0) {
+      setNumberOfGroups(value)
+    }
+  }
 
   return (
     <Stack
       gap={5}
       justifyItems="center"
-      alignItems="center"
+      alignItems="start"
       sx={{
-        width: '100%'
+        p: 4,
+        width: 600,
+        borderRadius: 2,
+        backgroundColor: 'background.default',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
       }}
     >
       <FileDropzone
         handleStudentsInformation={(data) => setStudentsInformation(data)}
+      />
+      <TextField
+        type="number"
+        label="Number of Groups"
+        value={numberOfGroups}
+        onChange={handleGroupsNumberChange}
+        inputProps={{ min: 1 }}
+        variant="outlined"
+        size="small"
       />
       <StudentConflicts
         studentConflicts={studentConflicts}
@@ -33,6 +55,7 @@ export function ClassDashboard(): ReactElement {
       <ClassGroups
         studentsInformation={studentsInformation}
         studentConflicts={studentConflicts}
+        numberOfGroups={numberOfGroups}
       />
     </Stack>
   )

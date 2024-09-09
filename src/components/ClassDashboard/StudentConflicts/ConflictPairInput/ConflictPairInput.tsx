@@ -44,7 +44,7 @@ export function ConflictPairInput({
         required
       />
       <Button type="submit" variant="contained">
-        Add Conflict
+        Add
       </Button>
     </Box>
   )
