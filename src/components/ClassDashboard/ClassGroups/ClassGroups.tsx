@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Groups2RoundedIcon from '@mui/icons-material/Groups2Rounded'
 import Avatar from '@mui/material/Avatar'
-import Grid from '@mui/material/Grid'
+import Divider from '@mui/material/Divider'
 import { ReactElement } from 'react'
 
 import {
@@ -26,8 +26,6 @@ export function ClassGroups({
   studentConflicts,
   numberOfGroups
 }: ClassGroupsProps): ReactElement {
-  console.log(studentConflicts)
-
   const sortedStudents = sortByScore(studentsInformation)
   const { specialNeeds, regular } = splitBySpecialNeeds(sortedStudents)
   const groups = classSorter(
@@ -39,17 +37,15 @@ export function ClassGroups({
   return (
     <Stack
       flexDirection="row"
-      gap={5 * numberOfGroups}
+      gap={1 * numberOfGroups}
       sx={{ flexWrap: 'wrap' }}
     >
       {studentsInformation.length > 0 &&
         groups.map((group, index) => (
           <Stack
-            gap={3}
             key={index}
             sx={{
-              p: 4,
-              width: 800,
+              width: 400,
               borderRadius: 2,
               backgroundColor: 'background.default',
               boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
@@ -59,7 +55,12 @@ export function ClassGroups({
               gap={2}
               flexDirection="row"
               alignItems="center"
-              sx={{ p: 4, backgroundColor: 'primary.main', borderRadius: 2 }}
+              sx={{
+                p: 4,
+                backgroundColor: 'primary.main',
+                borderTopLeftRadius: 8,
+                borderTopRightRadius: 8
+              }}
             >
               <Groups2RoundedIcon
                 fontSize="large"
@@ -69,13 +70,23 @@ export function ClassGroups({
                 Class {index + 1}
               </Typography>
             </Stack>
-            <Grid container spacing={2}>
+            <Stack
+              direction="column"
+              divider={
+                <Divider
+                  sx={{
+                    borderColor: 'text.secondary',
+                    opacity: 0.4,
+                    '&:last-child': { display: 'none' }
+                  }}
+                />
+              }
+              sx={{ overflowX: 'auto' }}
+            >
               {group.map((student) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={student.name}>
-                  <StudentCard student={student} />
-                </Grid>
+                <StudentCard key={student.name} student={student} />
               ))}
-            </Grid>
+            </Stack>
           </Stack>
         ))}
     </Stack>
@@ -100,18 +111,30 @@ function StudentCard({ student }: { student: GroupedStudent }): ReactElement {
           flexDirection="row"
           alignItems="center"
           sx={{
-            p: 2,
+            py: 2,
+            px: 6,
             borderRadius: 2,
             borderColor: 'text.secondary'
           }}
         >
           <Avatar
             alt={student.name}
-            sx={{ backgroundColor, color: 'text.primary' }}
+            sx={{
+              backgroundColor,
+              color: 'text.primary',
+              width: 36,
+              height: 36,
+              fontSize: '0.75rem'
+            }}
           >
             {student.name.charAt(0)}
           </Avatar>
-          <Stack>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ width: '100%' }}
+          >
             <Typography variant="h3">{student.name}</Typography>
             <Typography variant="body2">Score: {student.totalScore}</Typography>
           </Stack>
