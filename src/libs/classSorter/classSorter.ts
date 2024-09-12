@@ -24,7 +24,7 @@ function getStudentScore(student: StudentInformation): number {
 export function sortByScore(
   students: StudentInformation[]
 ): StudentInformation[] {
-  return students.sort((a, b) => getStudentScore(a) - getStudentScore(b))
+  return students.sort((a, b) => getStudentScore(b) - getStudentScore(a)) // Sort in descending order
 }
 
 export function splitBySpecialNeeds(students: StudentInformation[]): {
@@ -66,41 +66,64 @@ export function classSorter(
   numberOfGroups: number,
   studentPairs: StudentPair[] = []
 ): GroupedStudent[][] {
-  const groups = Array.from(
+  const sortedStudents = sortByScore(students)
+  const groups: GroupedStudent[][] = Array.from(
     { length: numberOfGroups },
-    () => [] as GroupedStudent[]
+    () => []
   )
-  let currentGroupIndex = 0
 
-  for (const student of students) {
+  for (const student of sortedStudents) {
     const studentWithScore: GroupedStudent = {
       name: student.name,
       totalScore: getStudentScore(student),
       specialNeeds: student.specialNeeds
     }
 
-    let placed = false
-    for (let i = 0; i < numberOfGroups; i++) {
+    let bestGroup = groups[0]
+    let leastConflicts = Infinity
+
+    for (const group of groups) {
+      const conflicts = studentPairs.filter(
+        ({ type, pair }) =>
+          type === 'conflict' &&
+          group.some(
+            (groupStudent) =>
+              (pair[0] === groupStudent.name && pair[1] === student.name) ||
+              (pair[0] === student.name && pair[1] === groupStudent.name)
+          )
+      ).length
+
       if (
-        canJoinGroup(groups[currentGroupIndex], studentWithScore, studentPairs)
+        conflicts < leastConflicts ||
+        (conflicts === leastConflicts && group.length < bestGroup.length)
       ) {
-        groups[currentGroupIndex].push(studentWithScore)
-        placed = true
+        leastConflicts = conflicts
+        bestGroup = group
+      }
+    }
+
+    bestGroup.push(studentWithScore)
+  }
+
+  // Balance the groups
+  let iterations = 0
+  const maxIterations = students.length * 2 // Prevent infinite loop
+
+  while (iterations < maxIterations) {
+    const maxGroup = groups.reduce((a, b) => (a.length > b.length ? a : b))
+    const minGroup = groups.reduce((a, b) => (a.length < b.length ? a : b))
+
+    if (maxGroup.length <= minGroup.length + 1) break // Groups are balanced
+
+    for (const student of maxGroup) {
+      if (canJoinGroup(minGroup, student, studentPairs)) {
+        maxGroup.splice(maxGroup.indexOf(student), 1)
+        minGroup.push(student)
         break
       }
-      currentGroupIndex = (currentGroupIndex + 1) % numberOfGroups
     }
 
-    if (!placed) {
-      // If the student couldn't be placed due to conflicts/pairings, place them in the group with the least students
-      const minGroup = groups.reduce(
-        (min, group) => (group.length < min.length ? group : min),
-        groups[0]
-      )
-      minGroup.push(studentWithScore)
-    }
-
-    currentGroupIndex = (currentGroupIndex + 1) % numberOfGroups
+    iterations++
   }
 
   return groups
