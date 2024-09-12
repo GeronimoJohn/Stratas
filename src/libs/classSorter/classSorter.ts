@@ -13,6 +13,10 @@ export interface GroupedStudent {
   specialNeeds: boolean
 }
 
+export type Pair = [string, string]
+export type PairType = 'conflict' | 'pair'
+export type StudentPair = { pair: Pair; type: PairType }
+
 function getStudentScore(student: StudentInformation): number {
   return student.reading + student.writing + student.math
 }
@@ -36,21 +40,31 @@ export function splitBySpecialNeeds(students: StudentInformation[]): {
 function canJoinGroup(
   group: GroupedStudent[],
   student: GroupedStudent,
-  conflicts: [string, string][]
+  studentPairs: StudentPair[]
 ): boolean {
-  return !group.some((existingStudent) =>
-    conflicts.some(
-      ([name1, name2]) =>
-        (name1 === existingStudent.name && name2 === student.name) ||
-        (name1 === student.name && name2 === existingStudent.name)
+  const hasConflict = group.some((existingStudent) =>
+    studentPairs.some(
+      ({ type, pair }) =>
+        type === 'conflict' &&
+        ((pair[0] === existingStudent.name && pair[1] === student.name) ||
+          (pair[0] === student.name && pair[1] === existingStudent.name))
     )
   )
+
+  const hasPairing = studentPairs.some(
+    ({ type, pair }) =>
+      type === 'pair' &&
+      ((pair[0] === student.name && group.some((s) => s.name === pair[1])) ||
+        (pair[1] === student.name && group.some((s) => s.name === pair[0])))
+  )
+
+  return !hasConflict && (hasPairing || studentPairs.length === 0)
 }
 
 export function classSorter(
   students: StudentInformation[],
   numberOfGroups: number,
-  conflicts: [string, string][] = []
+  studentPairs: StudentPair[] = []
 ): GroupedStudent[][] {
   const groups = Array.from(
     { length: numberOfGroups },
@@ -65,13 +79,27 @@ export function classSorter(
       specialNeeds: student.specialNeeds
     }
 
-    while (
-      !canJoinGroup(groups[currentGroupIndex], studentWithScore, conflicts)
-    ) {
+    let placed = false
+    for (let i = 0; i < numberOfGroups; i++) {
+      if (
+        canJoinGroup(groups[currentGroupIndex], studentWithScore, studentPairs)
+      ) {
+        groups[currentGroupIndex].push(studentWithScore)
+        placed = true
+        break
+      }
       currentGroupIndex = (currentGroupIndex + 1) % numberOfGroups
     }
 
-    groups[currentGroupIndex].push(studentWithScore)
+    if (!placed) {
+      // If the student couldn't be placed due to conflicts/pairings, place them in the group with the least students
+      const minGroup = groups.reduce(
+        (min, group) => (group.length < min.length ? group : min),
+        groups[0]
+      )
+      minGroup.push(studentWithScore)
+    }
+
     currentGroupIndex = (currentGroupIndex + 1) % numberOfGroups
   }
 

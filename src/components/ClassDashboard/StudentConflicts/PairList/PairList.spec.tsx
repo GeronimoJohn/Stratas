@@ -1,8 +1,8 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { ConflictList } from './ConflictList'
-import { StudentPair } from '../StudentConflicts'
+import { ConflictList } from './PairList'
+import { StudentPair } from '../StudentPairs'
 
 describe('ConflictList', () => {
   const mockConflicts: StudentPair[] = [

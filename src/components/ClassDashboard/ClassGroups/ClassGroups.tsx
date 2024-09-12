@@ -14,19 +14,19 @@ import {
   StudentInformation
 } from '@/libs/classSorter'
 
-import type { StudentPair } from '../StudentConflicts/StudentConflicts'
 import { StudentCard } from './StudentCard'
 import { useReactToPrint } from 'react-to-print'
+import { StudentPair } from '@/libs/classSorter'
 
 interface ClassGroupsProps {
   studentsInformation?: StudentInformation[]
-  studentConflicts?: StudentPair[]
+  studentPairs?: StudentPair[]
   numberOfGroups: number
 }
 
 export function ClassGroups({
   studentsInformation = [],
-  studentConflicts,
+  studentPairs,
   numberOfGroups
 }: ClassGroupsProps): ReactElement {
   const printRef = useRef<HTMLDivElement>(null)
@@ -36,7 +36,7 @@ export function ClassGroups({
   const groups = classSorter(
     [...specialNeeds, ...regular],
     numberOfGroups,
-    studentConflicts
+    studentPairs
   )
 
   const handleClick = useReactToPrint({

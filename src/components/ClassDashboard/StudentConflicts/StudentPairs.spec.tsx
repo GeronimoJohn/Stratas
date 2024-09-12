@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { StudentConflicts, StudentPair } from './StudentConflicts'
+import { StudentConflicts, StudentPair } from './StudentPairs'
 
 describe('StudentConflicts', () => {
   it('renders the component with title', () => {

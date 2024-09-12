@@ -1,11 +1,11 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { ConflictPairInput } from './ConflictPairInput'
+import { StudentPairsInput } from './StudentPairsInput'
 
-describe('ConflictPairInput', () => {
+describe('StudentPairsInput', () => {
   it('renders two input fields and a button', () => {
-    render(<ConflictPairInput onAddConflict={jest.fn()} />)
+    render(<StudentPairsInput onAddConflict={jest.fn()} />)
 
     expect(
       screen.getByRole('textbox', { name: 'Student 1' })
@@ -21,7 +21,7 @@ describe('ConflictPairInput', () => {
   it('calls onAddConflict with correct values when form is submitted', async () => {
     const mockOnAddConflict = jest.fn()
 
-    render(<ConflictPairInput onAddConflict={mockOnAddConflict} />)
+    render(<StudentPairsInput onAddConflict={mockOnAddConflict} />)
 
     fireEvent.change(screen.getByRole('textbox', { name: 'Student 1' }), {
       target: { value: 'Alice' }
@@ -36,7 +36,7 @@ describe('ConflictPairInput', () => {
   it('does not call onAddConflict when inputs are empty', () => {
     const mockOnAddConflict = jest.fn()
 
-    render(<ConflictPairInput onAddConflict={mockOnAddConflict} />)
+    render(<StudentPairsInput onAddConflict={mockOnAddConflict} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Add Conflict' }))
     expect(mockOnAddConflict).not.toHaveBeenCalled()

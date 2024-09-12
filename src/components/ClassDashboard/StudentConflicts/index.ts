@@ -1,1 +1,1 @@
-export { StudentConflicts } from './StudentConflicts'
+export { StudentPairs } from './StudentPairs'
