@@ -1,40 +1,99 @@
+import orderBy from 'lodash/orderBy'
+import groupBy from 'lodash/groupBy'
+import minBy from 'lodash/minBy'
+import maxBy from 'lodash/maxBy'
+import range from 'lodash/range'
+import isEmpty from 'lodash/isEmpty'
+
 export interface StudentInformation {
   id: string
   name: string
   reading: number
   writing: number
   math: number
-  specialNeeds: boolean
+  highNeeds: boolean
 }
 
 export interface GroupedStudent {
   name: string
   totalScore: number
-  specialNeeds: boolean
+  highNeeds: boolean
 }
 
 export type Pair = [string, string]
 export type PairType = 'conflict' | 'pair'
-export type StudentPair = { pair: Pair; type: PairType }
+export interface StudentPair {
+  pair: Pair
+  type: PairType
+}
 
 function getStudentScore(student: StudentInformation): number {
   return student.reading + student.writing + student.math
 }
 
+function createGroupedStudent(student: StudentInformation): GroupedStudent {
+  return {
+    name: student.name,
+    totalScore: getStudentScore(student),
+    highNeeds: student.highNeeds
+  }
+}
+
 export function sortByScore(
   students: StudentInformation[]
 ): StudentInformation[] {
-  return students.sort((a, b) => getStudentScore(b) - getStudentScore(a)) // Sort in descending order
+  return orderBy(students, [getStudentScore], ['asc'])
 }
 
-export function splitBySpecialNeeds(students: StudentInformation[]): {
-  specialNeeds: StudentInformation[]
+export function splitByHighNeeds(students: StudentInformation[]): {
+  highNeeds: StudentInformation[]
   regular: StudentInformation[]
 } {
   return {
-    specialNeeds: students.filter((student) => student.specialNeeds),
-    regular: students.filter((student) => !student.specialNeeds)
+    highNeeds: students.filter(function (student) {
+      return student.highNeeds
+    }),
+    regular: students.filter(function (student) {
+      return !student.highNeeds
+    })
   }
+}
+
+function hasConflict(
+  group: GroupedStudent[],
+  student: GroupedStudent,
+  studentPairs: StudentPair[]
+): boolean {
+  return group.some(function (existingStudent) {
+    return studentPairs.some(function ({ type, pair }) {
+      return (
+        type === 'conflict' &&
+        pair.includes(existingStudent.name) &&
+        pair.includes(student.name)
+      )
+    })
+  })
+}
+
+function hasPairing(
+  group: GroupedStudent[],
+  student: GroupedStudent,
+  studentPairs: StudentPair[]
+): boolean {
+  console.log('hasPairing', studentPairs)
+  return studentPairs.some(({ type, pair }) => {
+    if (type !== 'pair') return false
+    if (!pair.includes(student.name)) return false
+    const otherStudent = pair.find((name) => name !== student.name)
+    if (!otherStudent) return false
+    return (
+      group.some((s) => s.name === otherStudent) ??
+      studentPairs.some(
+        ({ pair }) =>
+          pair.includes(student.name) && !pair.includes(otherStudent)
+      )
+    )
+  })
 }
 
 function canJoinGroup(
@@ -42,23 +101,69 @@ function canJoinGroup(
   student: GroupedStudent,
   studentPairs: StudentPair[]
 ): boolean {
-  const hasConflict = group.some((existingStudent) =>
-    studentPairs.some(
-      ({ type, pair }) =>
-        type === 'conflict' &&
-        ((pair[0] === existingStudent.name && pair[1] === student.name) ||
-          (pair[0] === student.name && pair[1] === existingStudent.name))
-    )
+  console.log('canJoinGroup', hasPairing(group, student, studentPairs))
+  return (
+    !hasConflict(group, student, studentPairs) &&
+    (hasPairing(group, student, studentPairs) || isEmpty(studentPairs))
   )
+}
 
-  const hasPairing = studentPairs.some(
-    ({ type, pair }) =>
-      type === 'pair' &&
-      ((pair[0] === student.name && group.some((s) => s.name === pair[1])) ||
-        (pair[1] === student.name && group.some((s) => s.name === pair[0])))
+function findBestGroup(
+  groups: GroupedStudent[][],
+  student: GroupedStudent,
+  studentPairs: StudentPair[]
+): GroupedStudent[] {
+  return (
+    minBy(groups, function (group) {
+      const conflictCount = studentPairs.filter(function ({ type, pair }) {
+        return (
+          type === 'conflict' &&
+          pair.includes(student.name) &&
+          group.some(function (groupStudent) {
+            return pair.includes(groupStudent.name)
+          })
+        )
+      }).length
+      return conflictCount * 1000 + group.length
+    }) || groups[0]
   )
+}
 
-  return !hasConflict && (hasPairing || studentPairs.length === 0)
+function balanceGroups(
+  groups: GroupedStudent[][],
+  studentPairs: StudentPair[]
+): GroupedStudent[][] {
+  const maxIterations =
+    groups.reduce(function (sum, group) {
+      return sum + group.length
+    }, 0) * 2
+
+  return range(maxIterations).reduce(function (acc) {
+    const maxGroup = maxBy(acc, 'length') as GroupedStudent[]
+    const minGroup = minBy(acc, 'length') as GroupedStudent[]
+
+    if (maxGroup.length <= minGroup.length) return acc
+
+    const studentToMove = maxGroup.find(function (student) {
+      return canJoinGroup(minGroup, student, studentPairs)
+    })
+
+    if (studentToMove) {
+      maxGroup.splice(maxGroup.indexOf(studentToMove), 1)
+
+      const insertIndex = minGroup.findIndex(
+        (s) => s.totalScore > studentToMove.totalScore
+      )
+
+      if (insertIndex === -1) {
+        minGroup.push(studentToMove)
+      } else {
+        minGroup.splice(insertIndex, 0, studentToMove)
+      }
+    }
+
+    return acc
+  }, groups)
 }
 
 export function classSorter(
@@ -66,65 +171,18 @@ export function classSorter(
   numberOfGroups: number,
   studentPairs: StudentPair[] = []
 ): GroupedStudent[][] {
-  const sortedStudents = sortByScore(students)
-  const groups: GroupedStudent[][] = Array.from(
-    { length: numberOfGroups },
-    () => []
+  const sortedStudents = sortByScore(students).map(createGroupedStudent)
+  const initialGroups: GroupedStudent[][] = range(numberOfGroups).map(
+    function () {
+      return []
+    }
   )
 
-  for (const student of sortedStudents) {
-    const studentWithScore: GroupedStudent = {
-      name: student.name,
-      totalScore: getStudentScore(student),
-      specialNeeds: student.specialNeeds
-    }
+  const groupedStudents = sortedStudents.reduce(function (groups, student) {
+    const bestGroup = findBestGroup(groups, student, studentPairs)
+    bestGroup.push(student)
+    return groups
+  }, initialGroups)
 
-    let bestGroup = groups[0]
-    let leastConflicts = Infinity
-
-    for (const group of groups) {
-      const conflicts = studentPairs.filter(
-        ({ type, pair }) =>
-          type === 'conflict' &&
-          group.some(
-            (groupStudent) =>
-              (pair[0] === groupStudent.name && pair[1] === student.name) ||
-              (pair[0] === student.name && pair[1] === groupStudent.name)
-          )
-      ).length
-
-      if (
-        conflicts < leastConflicts ||
-        (conflicts === leastConflicts && group.length < bestGroup.length)
-      ) {
-        leastConflicts = conflicts
-        bestGroup = group
-      }
-    }
-
-    bestGroup.push(studentWithScore)
-  }
-
-  // Balance the groups
-  let iterations = 0
-  const maxIterations = students.length * 2 // Prevent infinite loop
-
-  while (iterations < maxIterations) {
-    const maxGroup = groups.reduce((a, b) => (a.length > b.length ? a : b))
-    const minGroup = groups.reduce((a, b) => (a.length < b.length ? a : b))
-
-    if (maxGroup.length <= minGroup.length + 1) break // Groups are balanced
-
-    for (const student of maxGroup) {
-      if (canJoinGroup(minGroup, student, studentPairs)) {
-        maxGroup.splice(maxGroup.indexOf(student), 1)
-        minGroup.push(student)
-        break
-      }
-    }
-
-    iterations++
-  }
-
-  return groups
+  return balanceGroups(groupedStudents, studentPairs)
 }

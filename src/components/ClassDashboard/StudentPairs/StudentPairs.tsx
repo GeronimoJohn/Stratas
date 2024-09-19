@@ -15,7 +15,7 @@ export function StudentPairs({
   studentPairs,
   setStudentPairs
 }: StudentPairsProps): ReactElement {
-  function onAddConflict(newPair: Pair, type: PairType): void {
+  function onAddPair(newPair: Pair, type: PairType): void {
     setStudentPairs([...studentPairs, { pair: newPair, type }])
   }
 
@@ -28,7 +28,7 @@ export function StudentPairs({
       <Typography variant="h5" gutterBottom>
         Student Conflicts and Pairs
       </Typography>
-      <StudentPairsInput onAddPair={onAddConflict} />
+      <StudentPairsInput onAddPair={onAddPair} />
       <PairList pairs={studentPairs} onRemovePair={onRemovePair} />
     </Box>
   )

@@ -58,7 +58,7 @@ export function StudentPairsInput({
           label="Type"
         >
           <MenuItem value="conflict">Conflict</MenuItem>
-          <MenuItem value="pairing">Pairing</MenuItem>
+          <MenuItem value="pair">Pair</MenuItem>
         </Select>
       </FormControl>
       <Button type="submit" variant="contained">

@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import { ClassGroups } from './ClassGroups'
 import { StudentInformation, StudentPair } from '@/libs/classSorter'
-import { StudentPairs } from './StudentConflicts'
+import { StudentPairs } from './StudentPairs'
 
 export function ClassDashboard(): ReactElement {
   const [studentsInformation, setStudentsInformation] =

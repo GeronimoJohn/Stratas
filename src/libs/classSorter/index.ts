@@ -5,4 +5,4 @@ export type {
   PairType,
   GroupedStudent
 } from './classSorter'
-export { sortByScore, splitBySpecialNeeds, classSorter } from './classSorter'
+export { sortByScore, splitByHighNeeds, classSorter } from './classSorter'

@@ -16,7 +16,7 @@ export function StudentCard({
   student
 }: StudentCardProps): ReactElement {
   const backgroundColor =
-    student.specialNeeds === true
+    student.highNeeds === true
       ? 'secondary.main'
       : student.totalScore > 7
         ? 'success.main'
