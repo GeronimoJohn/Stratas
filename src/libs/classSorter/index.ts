@@ -1,2 +1,8 @@
-export type { StudentInformation, GroupedStudent } from './classSorter'
-export { sortByScore, splitBySpecialNeeds, classSorter } from './classSorter'
+export type {
+  StudentInformation,
+  StudentPair,
+  Pair,
+  PairType,
+  GroupedStudent
+} from './classSorter'
+export { sortByScore, splitByHighNeeds, classSorter } from './classSorter'

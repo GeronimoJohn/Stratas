@@ -10,34 +10,37 @@ import Typography from '@mui/material/Typography'
 import {
   classSorter,
   sortByScore,
-  splitBySpecialNeeds,
+  splitByHighNeeds,
   StudentInformation
 } from '@/libs/classSorter'
 
-import type { StudentPair } from '../StudentConflicts/StudentConflicts'
 import { StudentCard } from './StudentCard'
 import { useReactToPrint } from 'react-to-print'
+import { StudentPair } from '@/libs/classSorter'
 
 interface ClassGroupsProps {
   studentsInformation?: StudentInformation[]
-  studentConflicts?: StudentPair[]
+  studentPairs?: StudentPair[]
   numberOfGroups: number
 }
 
 export function ClassGroups({
   studentsInformation = [],
-  studentConflicts,
+  studentPairs,
   numberOfGroups
 }: ClassGroupsProps): ReactElement {
   const printRef = useRef<HTMLDivElement>(null)
 
   const sortedStudents = sortByScore(studentsInformation)
-  const { specialNeeds, regular } = splitBySpecialNeeds(sortedStudents)
+  // console.log('sortedStudents', sortedStudents)
+  const { highNeeds, regular } = splitByHighNeeds(sortedStudents)
+  // console.log('highNeeds', highNeeds)
   const groups = classSorter(
-    [...specialNeeds, ...regular],
+    [...highNeeds, ...regular],
     numberOfGroups,
-    studentConflicts
+    studentPairs
   )
+  // console.log('groups', groups)
 
   const handleClick = useReactToPrint({
     content: () => printRef.current,

@@ -1,0 +1,1 @@
+export { StudentPairsInput } from './StudentPairsInput'

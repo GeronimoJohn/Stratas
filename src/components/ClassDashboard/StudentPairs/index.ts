@@ -1,0 +1,1 @@
+export { StudentPairs } from './StudentPairs'
