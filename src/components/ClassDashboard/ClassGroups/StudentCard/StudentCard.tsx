@@ -26,7 +26,7 @@ export function StudentCard({
 
   return (
     <>
-      {student.name != null ? (
+      {student.id != null ? (
         <Stack
           gap={6}
           flexDirection="row"
@@ -39,7 +39,7 @@ export function StudentCard({
           }}
         >
           <Avatar
-            alt={student.name}
+            alt={student.id}
             sx={{
               backgroundColor,
               color: 'text.primary',
@@ -51,13 +51,19 @@ export function StudentCard({
             {index + 1}
           </Avatar>
           <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ width: '100%' }}
+            direction="column"
+            alignItems="start"
           >
-            <Typography variant="h3">{student.name}</Typography>
-            <Typography variant="body2">Score: {student.totalScore}</Typography>
+            <Typography variant="h3">{student.firstName} {student.lastName}</Typography>
+            <Stack direction="row" gap={4} justifyContent="space-between" sx={{width: '100%'}}>
+              <Typography variant="body2">Score: {student.totalScore}</Typography>
+              <Typography variant='body2'>Gender: {student.gender}</Typography>
+              {student.esol && (
+                <Typography variant='body2'>
+                  Esol: Yes
+                </Typography>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       ) : (

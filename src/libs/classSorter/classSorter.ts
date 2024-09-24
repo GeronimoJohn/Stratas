@@ -7,17 +7,24 @@ import isEmpty from 'lodash/isEmpty'
 
 export interface StudentInformation {
   id: string
-  name: string
+  firstName: string
+  lastName: string
   reading: number
   writing: number
   math: number
   highNeeds: boolean
+  gender: 'male' | 'female' | 'other'
+  esol: boolean
 }
 
 export interface GroupedStudent {
-  name: string
+  id: string
+  firstName: string
+  lastName: string
   totalScore: number
   highNeeds: boolean
+  gender: 'male' | 'female' | 'other'
+  esol: boolean
 }
 
 export type Pair = [string, string]
@@ -33,9 +40,13 @@ function getStudentScore(student: StudentInformation): number {
 
 function createGroupedStudent(student: StudentInformation): GroupedStudent {
   return {
-    name: student.name,
+    id: student.id,
+    firstName: student.firstName,
+    lastName: student.lastName,
     totalScore: getStudentScore(student),
-    highNeeds: student.highNeeds
+    highNeeds: student.highNeeds,
+    gender: student.gender,
+    esol: student.esol
   }
 }
 
@@ -64,8 +75,8 @@ function hasConflict(
     studentPairs.some(
       ({ type, pair }) =>
         type === 'conflict' &&
-        pair.includes(existingStudent.name) &&
-        pair.includes(student.name)
+        pair.includes(`${existingStudent.firstName} ${existingStudent.lastName}`) &&
+        pair.includes(`${student.firstName} ${student.lastName}`)
     )
   )
 }
@@ -77,14 +88,14 @@ function hasPairing(
 ): boolean {
   return studentPairs.some(({ type, pair }) => {
     if (type !== 'pair') return false
-    if (!pair.includes(student.name)) return false
-    const otherStudent = pair.find((name) => name !== student.name)
+    if (!pair.includes(`${student.firstName} ${student.lastName}`)) return false
+    const otherStudent = pair.find((name) => name !== `${student.firstName} ${student.lastName}`)
     if (!otherStudent) return false
     return (
-      group.some((s) => s.name === otherStudent) ||
+      group.some((s) => `${s.firstName} ${s.lastName}` === otherStudent) ||
       studentPairs.some(
         ({ pair }) =>
-          pair.includes(student.name) && !pair.includes(otherStudent)
+          pair.includes(`${student.firstName} ${student.lastName}`) && !pair.includes(otherStudent)
       )
     )
   })
@@ -95,10 +106,18 @@ function canJoinGroup(
   student: GroupedStudent,
   studentPairs: StudentPair[]
 ): boolean {
+  console.log(!hasConflict(group, student, studentPairs))
   return (
     !hasConflict(group, student, studentPairs) &&
     (hasPairing(group, student, studentPairs) || isEmpty(studentPairs))
   )
+}
+
+function calculateGenderImbalance(group: GroupedStudent[]): number {
+  const genderCounts = groupBy(group, 'gender')
+  const maleCount = (genderCounts['male'] || []).length
+  const femaleCount = (genderCounts['female'] || []).length
+  return Math.abs(maleCount - femaleCount)
 }
 
 function findBestGroup(
@@ -111,10 +130,11 @@ function findBestGroup(
       const conflictCount = studentPairs.filter(
         ({ type, pair }) =>
           type === 'conflict' &&
-          pair.includes(student.name) &&
-          group.some((groupStudent) => pair.includes(groupStudent.name))
+          pair.includes(`${student.firstName} ${student.lastName}`) &&
+          group.some((groupStudent) => pair.includes(`${groupStudent.firstName} ${groupStudent.lastName}`))
       ).length
-      return conflictCount * 1000 + group.length
+      const genderImbalance = calculateGenderImbalance([...group, student])
+      return conflictCount * 1000 + group.length * 100 + genderImbalance
     }) || groups[0]
   )
 }
@@ -125,16 +145,17 @@ function balanceGroups(
 ): GroupedStudent[][] {
   const maxIterations = groups.reduce((sum, group) => sum + group.length, 0) * 2
 
-  let balancedGroups = [...groups] // Ensure we're not mutating the original array
+  let balancedGroups = [...groups]
 
   for (let i = 0; i < maxIterations; i++) {
     const maxGroup = maxBy(balancedGroups, 'length') as GroupedStudent[]
     const minGroup = minBy(balancedGroups, 'length') as GroupedStudent[]
 
-    if (maxGroup.length <= minGroup.length) break
+    if (maxGroup.length <= minGroup.length + 1) break
 
     const studentToMove = maxGroup.find((student) =>
-      canJoinGroup(minGroup, student, studentPairs)
+      canJoinGroup(minGroup, student, studentPairs) &&
+      calculateGenderImbalance([...minGroup, student]) <= calculateGenderImbalance(minGroup)
     )
 
     if (studentToMove) {
@@ -168,14 +189,14 @@ export function classSorter(
 
   function addToGroup(student: GroupedStudent, group: GroupedStudent[]) {
     group.push(student)
-    groupedStudents.add(student.name)
+    groupedStudents.add(`${student.firstName} ${student.lastName}`)
   }
 
   studentPairs.forEach(({ pair, type }) => {
     if (type === 'pair') {
       const [student1, student2] = pair
-      const student1Obj = sortedStudents.find((s) => s.name === student1)
-      const student2Obj = sortedStudents.find((s) => s.name === student2)
+      const student1Obj = sortedStudents.find((s) => `${s.firstName} ${s.lastName}` === student1)
+      const student2Obj = sortedStudents.find((s) => `${s.firstName} ${s.lastName}` === student2)
 
       if (
         student1Obj &&
@@ -192,7 +213,7 @@ export function classSorter(
   })
 
   sortedStudents.forEach((student) => {
-    if (!groupedStudents.has(student.name)) {
+    if (!groupedStudents.has(`${student.firstName} ${student.lastName}`)) {
       const bestGroup = findBestGroup(initialGroups, student, studentPairs)
       bestGroup.push(student)
     }

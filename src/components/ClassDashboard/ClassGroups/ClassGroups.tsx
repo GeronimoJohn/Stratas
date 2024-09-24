@@ -1,9 +1,9 @@
 import { ReactElement, useRef } from 'react'
-
+import Papa from 'papaparse'
+import { saveAs } from 'file-saver'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Groups2RoundedIcon from '@mui/icons-material/Groups2Rounded'
-import PrintIcon from '@mui/icons-material/Print'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -15,8 +15,7 @@ import {
 } from '@/libs/classSorter'
 
 import { StudentCard } from './StudentCard'
-import { useReactToPrint } from 'react-to-print'
-import { StudentPair } from '@/libs/classSorter'
+import { StudentPair, GroupedStudent } from '@/libs/classSorter'
 
 interface ClassGroupsProps {
   studentsInformation?: StudentInformation[]
@@ -32,54 +31,55 @@ export function ClassGroups({
   const printRef = useRef<HTMLDivElement>(null)
 
   const sortedStudents = sortByScore(studentsInformation)
-  // console.log('sortedStudents', sortedStudents)
   const { highNeeds, regular } = splitByHighNeeds(sortedStudents)
-  // console.log('highNeeds', highNeeds)
   const groups = classSorter(
     [...highNeeds, ...regular],
     numberOfGroups,
     studentPairs
   )
-  // console.log('groups', groups)
 
-  const handleClick = useReactToPrint({
-    content: () => printRef.current,
-    pageStyle: `
-      @page {
-        size: auto;
-        margin: 20mm;
-      }
-      @media print {
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        .MuiStack-root[data-testid="class-groups"] {
-          display: flex !important;
-          flex-direction: row !important;
-          flex-wrap: wrap !important;
-          justify-content: center !important;
-          gap: ${1 * numberOfGroups * 8}px !important;
-        }
-        .MuiStack-root[data-testid="class-groups"] > * {
-          page-break-inside: avoid;
-          margin-bottom: 20px;
-        }
-      }
-    `,
-    removeAfterPrint: true
-  })
+  const handleExportCSV = () => {
+    const csvData: string[][] = []
+    groups.forEach((group, index) => {
+      csvData.push([`Class ${index + 1}`])
+      csvData.push([
+        'ID',
+        'First Name',
+        'Last Name',
+        'Total Score',
+        'High Needs',
+        'Gender',
+        'ESOL'
+      ])
+      group.forEach((student: GroupedStudent) => {
+        csvData.push([
+          student.id,
+          student.firstName,
+          student.lastName,
+          student.totalScore.toString(),
+          student.highNeeds ? 'Yes' : 'No',
+          student.gender,
+          student.esol ? 'Yes' : 'No'
+        ])
+      })
+      csvData.push([])
+    })
+
+    const csv = Papa.unparse(csvData)
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    saveAs(blob, 'class_groups.csv')
+  }
 
   return (
     <>
       <Button
         variant="contained"
-        startIcon={<PrintIcon />}
-        onClick={handleClick}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, ml: 2 }}
+        onClick={handleExportCSV}
         className="no-print"
       >
-        Print
+        Export CSV
       </Button>
       <Stack
         ref={printRef}
@@ -133,7 +133,7 @@ export function ClassGroups({
               >
                 {group.map((student, index) => (
                   <StudentCard
-                    key={student.name}
+                    key={student.id}
                     index={index}
                     student={student}
                   />
