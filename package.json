@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "file-saver": "^2.0.5",
     "jest-environment-jsdom": "^29.7.0",
     "lodash": "^4.17.21",
     "next": "14.2.5",
@@ -22,8 +23,7 @@
     "prettier": "^3.3.3",
     "react": "^18",
     "react-dom": "^18",
-    "react-dropzone": "^14.2.3",
-    "react-to-print": "^2.15.1"
+    "react-dropzone": "^14.2.3"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.3",
@@ -34,6 +34,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^16.0.0",
+    "@types/file-saver": "^2.0.7",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.7",
     "@types/node": "^20",
